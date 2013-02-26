@@ -153,6 +153,9 @@ when CLIENT_DATA {
                 }
             }
         }
+        
+        if {$DBG}{log local0.debug "$log_prefix_d Option: $option Value: $value"}
+
         set index = [expr {$index + 4 + $len} 
     }
 
