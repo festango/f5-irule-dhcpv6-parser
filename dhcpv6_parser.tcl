@@ -3,17 +3,16 @@
 #
 #   Written By:  Shun Takahashi (s.takahashi at f5.com)
 #
-#   Description: 
-#            iRule to demonstrate how tocapture and binary scan DHCPv6 server
-#            response and extract client  
+#   Description: iRule to demonstrate how tocapture and binary scan DHCPv6 server
+#                response and extract client  
 #
-#            RFC2131 defines DHCP packet structure. This irule is to scan 
-#            UDP payload and store information into session tables with
-#            your_ip as a key.
+#                RFC2131 defines DHCP packet structure. This irule is to scan 
+#                UDP payload and store information into session tables with
+#                your_ip as a key.
 #
-#           Rule stores client address and DUID into session table
+#                Rule stores client address and DUID into session table
 #
-#            [tabe set <client_address> <DUID>]
+#                      [tabe set <client_address> <DUID>]
 #                                                   
 #                
 #   Requirement: The rule requires virtual server to listen on DHCP traffic in the
@@ -92,9 +91,8 @@ when CLIENT_DATA {
             # .                        (variable length)                      .
             # .                                                               .
             # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
+            #
                 binary scan $options @{index}x4a{option_length} client_duid
-
             }
 
             2 {
@@ -113,9 +111,8 @@ when CLIENT_DATA {
             # .                        (variable length)                      .
             # .                                                               .
             # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
+            #
                 binary scan $options @{index}x4a{option_length} server_duid
- 
             }
 
             3 {
@@ -147,11 +144,10 @@ when CLIENT_DATA {
                 binary scan $options @{index}x4a{option_length} value
                 binary scan $value a4a8a8a2a2a* IAID T1 T2 ia_na_option ia_na_len value
 
-                # The rule only cares option 5 Internet Address and ignores lifetime value 
+                # The rule only handles Internet Address(option 5) 
                 if {ia_na_option == 5} {
-                    binary scan $value h2h2h2h2h2h2h2h4h4 a(1) a(2) a(3) a(4) a(5) a(6) a(7) a(8) \
-                                                          preffered_lifetime valid_lifetime
-                    
+                    binary scan $value h2h2h2h2h2h2h2h4h4 \
+                        a(1) a(2) a(3) a(4) a(5) a(6) a(7) a(8) preffered_lifetime valid_lifetime
                     # Returns IPv6 address
                     set client_ipv6_addr "$a(1):$a(2):$a(3):$a(4):$a(5):$a(6):$a(7):$a(8)"
                 }
