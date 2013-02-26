@@ -3,24 +3,22 @@
 #
 #   Written By:  Shun Takahashi (s.takahashi at f5.com)
 #
-#   Description: iRule to demonstrate how tocapture and binary scan DHCPv6 server
-#                response and extract client  
+#   Description: iRule to demonstrate how to capture and binary scan DHCPv6 server
+#                reply to extract client DUID and IA (IPv6 Addr)
 #
-#                RFC2131 defines DHCP packet structure. This irule is to scan 
-#                UDP payload and store information into session tables with
-#                your_ip as a key.
+#                This irule is to scan UDP payload and store information into session 
+#                tables with your_ip as a key.
 #
 #                Rule stores client address and DUID into session table
 #
 #                      [tabe set <client_address> <DUID>]
 #                                                   
-#                
 #   Requirement: The rule requires virtual server to listen on DHCP traffic in the
 #                middle either in inline or out of band.
 #
 #                1) Add following DB key
 #
-#                tmsh modify tmos.sys.db.tm.allowmulticastl2destinationtraffic value enable
+#                tmsh modify sys db tm.allowmulticastl2destinationtraffic value enable
 #                tmsh modify sys db vlangroup.forwarding.override value disable
 #
 #                2) Create VS to receive mirrored DHCPv6 stream
