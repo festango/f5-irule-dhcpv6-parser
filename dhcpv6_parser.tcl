@@ -1,5 +1,5 @@
 #
-# DHCPv6 Option Field Parser rev 0.2 (2013/02/25)
+# DHCPv6 Option Field Parser rev 0.1 (2013/02/25)
 #
 #   Written By:  Shun Takahashi (s.takahashi at f5.com)
 #
@@ -18,9 +18,30 @@
 #   Requirement: The rule requires virtual server to listen on DHCP traffic in the
 #                middle either in inline or out of band.
 #
-#                1) In-Line to DHCP traffic
+#                1) Add following DB key
 #
-#                2) Receiving mirrored DHCP stream
+#                tmsh modify tmos.sys.db.tm.allowmulticastl2destinationtraffic value enable
+#                tmsh modify sys db vlangroup.forwarding.override value disable
+#
+#                2) Create VS to receive mirrored DHCPv6 stream
+#
+#                            ltm virtual vs_dhcpv6 {
+#                                destination 0::0.546
+#                                ip-protocol udp
+#                                mask any6
+#                                profiles {
+#                                    udp { }
+#                                }
+#                                rules {
+#                                    dhcp-v6
+#                                }
+#                                translate-address disabled
+#                                translate-port disabled
+#                                vlans {
+#                                    local
+#                                }
+#                                vlans-enabled
+#                            }
 #
 #   References:  RFC 3315 Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
 #
@@ -163,7 +184,7 @@ when CLIENT_DATA {
                     if {$DBG}{log local0.debug "$log_prefix_d Client IA: $client_ipv6_addr"}
                 }
             }
-        } 
+        }
         
         set index [expr {$index + 8 + $option_length}]
     }
