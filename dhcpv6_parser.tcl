@@ -1,5 +1,5 @@
 #
-# DHCPv6 Option Field Parser rev 0.1 (2013/02/25)
+# DHCPv6 Option Field Parser rev 0.2 (2013/02/25)
 #
 #   Written By:  Shun Takahashi (s.takahashi at f5.com)
 #
@@ -45,7 +45,7 @@ when CLIENT_ACCEPTED priority 100 {
 when CLIENT_DATA {
     if {$DBG}{log local0.debug "$log_prefix_d  ***** iRule: $static::RULE_NAME executed *****"}
 
-    binary scan [UDP::payload] cH3H* msg_type_hex transaction_id options 
+    binary scan [UDP::payload] cH6H* msg_type_hex transaction_id options 
 
     set msg_type [expr 0x$msg_type_hex]
     switch $msg_type {
@@ -64,17 +64,22 @@ when CLIENT_DATA {
         13 {set msg_type "RELAU-REPL"}
     }
 
-    if {$DBG}{log local0.debug "$log_prefix_d DHCPv6 $msg_type ($msg_type_hex} TID $transaction_id"
-
+    if {$DBG}{log local0.debug "$log_prefix_d DHCPv6 $msg_type ($msg_type_hex) TID 0x$transaction_id"}
+ 
     # Extract DHCPv6 Options Field
     set index 0
-    set options_length [expr {([UDP::payload length] - 3) * 2 }] 
-
+    set options_length [expr {([UDP::payload length] - 3) * 2 }]
+    
+    set client_ipv6_addr "none"
+    set client_duid "none"
+    
     while { $index < $options_length} {
-        binary scan $options @${index}c2c2 option_code_hex option_length
-        set option [expr 0x$option_hex]
+        binary scan $options @${index}a4a4 option_code_hex option_length_hex
+        
+        set option_code [expr 0x$option_code_hex]
+        set option_length [expr (0x$option_length_hex) * 2]
 
-        switch option_code {
+        switch $option_code {
             1 { 
             # Client Identifier
             # The Client Identifier option is used to carry a DUID (see section 9)
@@ -92,7 +97,8 @@ when CLIENT_DATA {
             # .                                                               .
             # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             #
-                binary scan $options @{index}x4a{option_length} client_duid
+                binary scan $options @${index}x8a${option_length} client_duid
+                if {$DBG}{log local0.debug "$log_prefix_d Client DUID: $client_duid"}
             }
 
             2 {
@@ -112,7 +118,8 @@ when CLIENT_DATA {
             # .                                                               .
             # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             #
-                binary scan $options @{index}x4a{option_length} server_duid
+                binary scan $options @${index}x8a${option_length} server_duid
+                if {$DBG}{log local0.debug "$log_prefix_d Server DUID: $server_duid"}
             }
 
             3 {
@@ -141,27 +148,29 @@ when CLIENT_DATA {
             # .                                                               .
             # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             # 
-                binary scan $options @{index}x4a{option_length} value
-                binary scan $value a4a8a8a2a2a* IAID T1 T2 ia_na_option ia_na_len value
-
+                binary scan $options @${index}x8a${option_length} value
+                binary scan $value a8a8a8a4a4a* IAID T1 T2 ia_na_option_hex ia_na_len_hex value
+                
+                set ia_na_option [expr 0x$ia_na_option_hex]
+                set ia_na_len [expr 0x$ia_na_len_hex]
+                
                 # The rule only handles Internet Address(option 5) 
-                if {ia_na_option == 5} {
-                    binary scan $value h2h2h2h2h2h2h2h4h4 \
+                if {$ia_na_option == 5} {
+                    binary scan $value a4a4a4a4a4a4a4a4h8h8 \
                         a(1) a(2) a(3) a(4) a(5) a(6) a(7) a(8) preffered_lifetime valid_lifetime
                     # Returns IPv6 address
                     set client_ipv6_addr "$a(1):$a(2):$a(3):$a(4):$a(5):$a(6):$a(7):$a(8)"
+                    if {$DBG}{log local0.debug "$log_prefix_d Client IA: $client_ipv6_addr"}
                 }
             }
-        }
+        } 
         
-        if {$DBG}{log local0.debug "$log_prefix_d Option: $option Value: $value"}
-
-        set index = [expr {$index + 4 + $len} 
+        set index [expr {$index + 8 + $option_length}]
     }
 
     # Stores Result into session table
-    table set $client_v6_addr $client_duid
+    table set $client_ipv6_addr $client_duid
 
-    log local0.info "$log_prefix Rule added IPv6 Addr: $client_v6_addr - Client DUID: $client_duid"
+    log local0.info "$log_prefix Rule added IPv6 Addr: $client_ipv6_addr - Client DUID: $client_duid"
     if {$DBG}{log local0.debug "$log_prefix_d  ***** iRule: $static::RULE_NAME competed *****"}
 }
