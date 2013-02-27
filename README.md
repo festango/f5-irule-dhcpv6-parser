@@ -67,4 +67,4 @@ The rule requires virtual server to listen on DHCP traffic in the middle either 
 
 ## Reference
 
-* RFC 3315 Dynamic Host Configuration Protocol for IPv6 (DHCPv6
+* RFC 3315 Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
