@@ -55,6 +55,17 @@ The rule requires virtual server to listen on DHCP traffic in the middle either 
 
 ## Sample Output
 
+```
+ bigip1 debug tmm1[8630]: Rule /Common/test <CLIENT_ACCEPTED>: 2001:fb64::222CLIENT CONNECTED! 
+ bigip1 debug tmm1[8630]: Rule /Common/dhcp-v6 <CLIENT_DATA>: [dhcpv6-parser](2001:fb64::222)(debug)  ***** iRule: Simple DHCPv6 Parser v0.1 executed ***** 
+ bigip1 debug tmm1[8630]: Rule /Common/dhcp-v6 <CLIENT_DATA>: [dhcpv6-parser](2001:fb64::222)(debug) DHCPv6 REPLY (7) TID 0x1403e7 
+ bigip1 debug tmm1[8630]: Rule /Common/dhcp-v6 <CLIENT_DATA>: [dhcpv6-parser](2001:fb64::222)(debug) Server DUID: 00010000512adf93000c2997c2f1 
+ bigip1 debug tmm1[8630]: Rule /Common/dhcp-v6 <CLIENT_DATA>: [dhcpv6-parser](2001:fb64::222)(debug) Client DUID: 0001000118bed2eb000c29643bc1 
+ bigip1 debug tmm1[8630]: Rule /Common/dhcp-v6 <CLIENT_DATA>: [dhcpv6-parser](2001:fb64::222)(debug) Client IA: 2001:fb64:0000:0000:1b5a:9e2b:4385:ac3a 
+ bigip1 info tmm1[8630]: Rule /Common/dhcp-v6 <CLIENT_DATA>: [dhcpv6-parser](2001:fb64::222) Rule added IPv6 Addr: 2001:fb64:0000:0000:1b5a:9e2b:4385:ac3a - Client DUID: 0001000118bed2eb000c29643bc1 
+ bigip1 debug tmm1[8630]: Rule /Common/dhcp-v6 <CLIENT_DATA>: [dhcpv6-parser](2001:fb64::222)(debug)  ***** iRule: Simple DHCPv6 Parser v0.1 competed ***** 
+```
+
 ## Reference
 
 * References:  RFC 3315 Dynamic Host Configuration Protocol for IPv6 (DHCPv6
