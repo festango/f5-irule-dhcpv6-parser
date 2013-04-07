@@ -1,7 +1,7 @@
 #
 # DHCPv6 Option Field Parser rev 0.1 (2013/02/25)
 #
-#   Written By:  Shun Takahashi (s.takahashi at f5.com)
+#   Written By:  Shun Takahashi 
 #
 #   Description: iRule to demonstrate how to capture and binary scan DHCPv6 server
 #                reply to extract client DUID and IA (IPv6 Addr)
