@@ -105,17 +105,6 @@ when CLIENT_DATA {
             # identifying a client between a client and a server.  The format of
             # the Client Identifier option is:
             #
-            # 0                   1                   2                   3
-            # 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # |        OPTION_CLIENTID        |          option-len           |
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # .                                                               .
-            # .                              DUID                             .
-            # .                        (variable length)                      .
-            # .                                                               .
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            #
                 binary scan $options @${index}x8a${option_length} client_duid
                 if {$DBG}{log local0.debug "$log_prefix_d Client DUID: $client_duid"}
             }
@@ -125,17 +114,6 @@ when CLIENT_DATA {
             # The Server Identifier option is used to carry a DUID (see section 9)
             # identifying a server between a client and a server.  The format of
             # the Server Identifier option is:
-            #
-            # 0                   1                   2                   3
-            # 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # |        OPTION_SERVERID        |          option-len           |
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # .                                                               .
-            # .                              DUID                             .
-            # .                        (variable length)                      .
-            # .                                                               .
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             #
                 binary scan $options @${index}x8a${option_length} server_duid
                 if {$DBG}{log local0.debug "$log_prefix_d Server DUID: $server_duid"}
@@ -149,24 +127,6 @@ when CLIENT_DATA {
             # 
             # Addresses appearing in an IA_NA option are not temporary addresses
             #
-            # The format of the IA_NA option is:
-            # 
-            # 0                   1                   2                   3
-            # 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # |          OPTION_IA_NA         |          option-len           |
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # |                        IAID (4 octets)                        |
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # |                              T1                               |
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # |                              T2                               |
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # |                                                               |
-            # .                         IA_NA-options                         .
-            # .                                                               .
-            # +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            # 
                 binary scan $options @${index}x8a${option_length} value
                 binary scan $value a8a8a8a4a4a* IAID T1 T2 ia_na_option_hex ia_na_len_hex value
                 
